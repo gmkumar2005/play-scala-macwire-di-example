@@ -21,3 +21,14 @@ podman run -it --rm \
  hseeberger/scala-sbt:graalvm-ce-20.0.0-java11_1.3.10_2.13.2 /bin/sh -c \
  "cd /workspace &&  ls &&  sbt -Dsbt.ci=true run"
 ```
+## Test if the application is running
+The play framework runs on port 9000 by default. To verify the results you can use curl 
+
+```
+curl localhost:9000
+
+kiran@lagom-dx4:~/workspace/playapp/play-scala-seed$ curl localhost:9000
+<h1>Welcome</h1><p>Your new application is ready.</p>kiran@lagom-dx4:~/workspace/playapp/play-scala-seed$
+
+```
+
