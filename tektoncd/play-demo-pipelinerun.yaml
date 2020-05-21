@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: play-demo-pipelinerun-33
+spec:
+  pipelineRef:
+    name: play-demo-pipeline
+  resources:
+    - name: play-demo-source
+      resourceRef:
+        name: greeting-app-git
+    - name: play-demo-builtImage
+      resourceRef:
+        name: greeting-app-registry
+  workspaces:
+    - name: local-sbt-repo
+      persistentVolumeClaim:
+        claimName: sbt-repo-pvc

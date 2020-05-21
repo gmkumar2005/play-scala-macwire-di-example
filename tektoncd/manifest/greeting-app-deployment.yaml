@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: greeting-app
+  labels:
+    app: greeting-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: greeting-app
+  template:
+    metadata:
+      labels:
+        app: greeting-app
+    spec:
+      containers:
+        - name: greeting-app
+          image: registry.192.168.23.31.nip.io/greeting-app
+          ports:
+            - containerPort: 9000

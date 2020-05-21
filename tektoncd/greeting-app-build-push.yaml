@@ -1,0 +1,42 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: greeting-app-build-push
+spec:
+  workspaces:
+    - name: sbt-repo
+  resources:
+    inputs:
+      - name: greeting-source
+        type: git
+    outputs:
+      - name: builtImage
+        type: image
+  steps:
+    - name: echo
+      image: alpine
+      script: |
+        #!/bin/sh
+        set -xe
+        echo hello!  $(workspaces.sbt-repo.path)
+        pwd 
+        ls -l 
+        du $(workspaces.sbt-repo.path) -h -d 2
+    - name: list
+      image: hseeberger/scala-sbt:graalvm-ce-20.0.0-java11_1.3.10_2.13.2
+      workingDir: /workspace/greeting-source
+      script: |
+        #!/bin/sh
+        set -xe
+        mkdir -p $(workspaces.sbt-repo.path)/.ivy2 
+        mkdir -p $(workspaces.sbt-repo.path)/.cache
+        mkdir -p $(workspaces.sbt-repo.path)/.sbt
+        mkdir -p $(workspaces.sbt-repo.path)/.coursier
+        sbt \
+        -Dsbt.ivy.home=$(workspaces.sbt-repo.path)/.ivy2 \
+        -Divy.home=.$(workspaces.sbt-repo.path)/.ivy2 \
+        -Dsbt.global.base=$(workspaces.sbt-repo.path)/.sbt  \
+        -Dcoursier.cache=$(workspaces.sbt-repo.path)/.cache \
+        -Dsbt.coursier.home=$(workspaces.sbt-repo.path)/.coursier \
+        dist  
+     

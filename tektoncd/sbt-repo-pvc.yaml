@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name:  sbt-repo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: tektoncd-class
+  resources:
+    requests:
+      storage: 5G

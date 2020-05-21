@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: greeting-app-registry
+spec:
+  type: image
+  params:
+    - name: url
+      value: registry.192.168.23.31.nip.io/greeting-app

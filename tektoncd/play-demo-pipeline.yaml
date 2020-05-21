@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: play-demo-pipeline
+spec:
+  workspaces:
+    - name: local-sbt-repo
+  resources:
+    - name: play-demo-source
+      type: git
+    - name: play-demo-builtImage
+      type: image
+  tasks:
+    - name: build-push-app
+      workspaces:
+        - name: sbt-repo
+          workspace: local-sbt-repo
+      taskRef:
+        name: greeting-app-build-push
+      resources:
+        inputs:
+          - name: greeting-source
+            resource: play-demo-source
+        outputs:
+          - name: builtImage
+            resource: play-demo-builtImage

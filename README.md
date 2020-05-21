@@ -31,4 +31,24 @@ kiran@lagom-dx4:~/workspace/playapp/play-scala-seed$ curl localhost:9000
 <h1>Welcome</h1><p>Your new application is ready.</p>kiran@lagom-dx4:~/workspace/playapp/play-scala-seed$
 
 ```
+## run tekton pipeline
 
+```
+kubectl apply -f greeting-app-git.yaml -n play-demo
+kubectl apply -f greeting-app-registry.yaml -n play-demo
+kubectl delete Task greeting-app-build-push -n play-demo && kubectl apply -f greeting-app-build-push.yaml -n play-demo
+
+kubectl delete  TaskRun  greeting-app-taskrun -n play-demo && kubectl apply -f greeting-app-taskrun.yaml -n play-demo
+tkn taskrun describe greeting-app-taskrun -n play-demo 
+tkn taskrun logs greeting-app-taskrun -n play-demo 
+
+kubectl delete pipeline play-demo-pipeline -n play-demo && kubectl apply -f play-demo-pipeline.yaml -n play-demo
+
+kubectl delete play-demo-pipelinerun.yaml -n play-demo  && kubectl apply -f play-demo-pipelinerun.yaml -n play-demo 
+
+kubectl apply -f play-demo-pipelinerun.yaml -n play-demo 
+tkn pipelinerun logs play-demo-pipelinerun-25  -f -n play-demo 
+
+kubectl apply -f sbt-repo-pvc.yaml -n play-demo
+podman run -it --rm  busybox  /bin/bash
+```

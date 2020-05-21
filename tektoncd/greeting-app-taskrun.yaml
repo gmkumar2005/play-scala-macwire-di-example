@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: greeting-app-taskrun
+spec:
+    taskRef:
+        name: greeting-app-build-push
+    resources:
+        inputs:
+            - name: greeting-source
+              resourceRef:
+                name: greeting-app-git
+        outputs:
+            - name: builtImage
+              resourceRef:
+                name: greeting-app-registry
