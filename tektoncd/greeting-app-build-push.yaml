@@ -14,7 +14,7 @@ spec:
         type: image
   steps:
     - name: echo
-      image: alpine
+      image: busybox
       script: |
         #!/bin/sh
         set -xe
@@ -22,7 +22,7 @@ spec:
         pwd 
         ls -l 
         du $(workspaces.sbt-repo.path) -h -d 2
-    - name: list
+    - name: dist
       image: hseeberger/scala-sbt:graalvm-ce-20.0.0-java11_1.3.10_2.13.2
       workingDir: /workspace/greeting-source
       script: |
@@ -39,4 +39,30 @@ spec:
         -Dcoursier.cache=$(workspaces.sbt-repo.path)/.cache \
         -Dsbt.coursier.home=$(workspaces.sbt-repo.path)/.coursier \
         dist  
+    - name : unzip
+      image : busybox
+      workingDir: /workspace/greeting-source/target/universal
+      script: |
+        #!/bin/sh
+        set -xe
+        mkdir -p app 
+        unzip -d  app play-scala-macwire-di-example-2.8.x.zip 
+    - name: build
+      image: quay.io/buildah/stable
+      securityContext:
+        privileged: true
+      workingDir: /workspace/greeting-source/target/universal/app
+      script: |
+        #!/bin/sh
+        set -xe
+        ls -l  
+        buildah version
+        container=$(buildah from adoptopenjdk:11-jre-openj9)
+        buildah run  $container -- mkdir -p /opt/app
+        buildah copy $container play-scala-macwire-di-example-2.8.x /opt/app/play-scala-macwire-di-example-2.8.x
+        buildah config --workingdir /opt/app/play-scala-macwire-di-example-2.8.x $container
+        buildah config --label maintainer="Kiran Kumar <gmkumar2005@gmail.com>" $container
+        buildah config --entrypoint "bin/play-scala-macwire-di-example" $container
+        buildah commit --format docker $container registry.192.168.23.31.nip.io/play-demo/greeting:latest
+        buildah push --tls-verify=false registry.192.168.23.31.nip.io/play-demo/greeting:latest
      

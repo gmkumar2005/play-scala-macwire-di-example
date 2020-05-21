@@ -52,3 +52,24 @@ tkn pipelinerun logs play-demo-pipelinerun-25  -f -n play-demo
 kubectl apply -f sbt-repo-pvc.yaml -n play-demo
 podman run -it --rm  busybox  /bin/bash
 ```
+
+## Tetkoncd permissions
+```
+kubectl create clusterrolebinding tetkon-admin-sa --clusterrole=cluster-admin --serviceaccount=default:tetkon-admin-sa -n play-demo
+
+
+kubectl create rolebinding default \
+  --clusterrole=cluster-admin \
+  --serviceaccount=tekton-pipelines:default \
+  --namespace=tekton-pipelines
+
+Add --allow-privileged=true to:
+#kube-apiserver config
+sudo vim /var/snap/microk8s/current/args/kube-apiserver
+sudo systemctl restart snap.microk8s.daemon-apiserver.service
+
+```
+
+## Run play-demo image
+podman search registry.192.168.23.31.nip.io/ 
+podman run -it --rm -p 9000:9000 registry.192.168.23.31.nip.io/play-demo/greeting:latest

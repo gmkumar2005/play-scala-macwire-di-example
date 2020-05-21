@@ -13,4 +13,5 @@ lazy val root = (project in file("."))
       "-deprecation",
       "-Xfatal-warnings"
     )
+    maintainer := "gmkumar2005@gmail.com"
   )
