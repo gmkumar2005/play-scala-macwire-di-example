@@ -62,7 +62,7 @@ spec:
         buildah copy $container play-scala-macwire-di-example-2.8.x /opt/app/play-scala-macwire-di-example-2.8.x
         buildah config --workingdir /opt/app/play-scala-macwire-di-example-2.8.x $container
         buildah config --label maintainer="Kiran Kumar <gmkumar2005@gmail.com>" $container
-        buildah config --entrypoint "bin/play-scala-macwire-di-example" $container
+        buildah config --entrypoint "bin/play-scala-macwire-di-example -Dplay.http.secret.key=ad31779d4ee49d5ad5162bf1429c32e2e9933f3b" $container
         buildah commit --format docker $container registry.192.168.23.31.nip.io/play-demo/greeting:latest
         buildah push --tls-verify=false registry.192.168.23.31.nip.io/play-demo/greeting:latest
      
