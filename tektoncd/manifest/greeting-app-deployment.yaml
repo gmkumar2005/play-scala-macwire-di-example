@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: greeting-app
-          image: registry.192.168.23.31.nip.io/greeting-app
+          image: localhost:32000/play-demo/greeting:latest
           ports:
             - containerPort: 9000

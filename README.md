@@ -70,6 +70,78 @@ sudo systemctl restart snap.microk8s.daemon-apiserver.service
 
 ```
 
-## Run play-demo image
+## Run play-demo image locally
+```
 podman search registry.192.168.23.31.nip.io/ 
 podman run -it --rm -p 9000:9000 registry.192.168.23.31.nip.io/play-demo/greeting:latest
+
+```
+## Deploy and expose to microk8s - use localhost:32000 since it is already added to insecure registries
+```
+kubectl create deployment greeting-app --image=localhost:32000/play-demo/greeting:latest -n play-demo 
+kubectl expose deployment greeting-app --type=NodePort --port=9000 -n play-demo 
+```
+## Create ingress yaml greeting-app-deployment.yaml
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: greeting-app
+  labels:
+    app: greeting-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: greeting-app
+  template:
+    metadata:
+      labels:
+        app: greeting-app
+    spec:
+      containers:
+        - name: greeting-app
+          image: localhost:32000/play-demo/greeting:latest
+          ports:
+            - containerPort: 9000
+```
+
+## Create ingress yaml greeting-app-ingress.yaml
+```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: play-app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+  - host: play-app.192.168.23.31.nip.io
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: greeting-app
+            servicePort: 9000
+```
+
+## Create service yaml greeting-app-service.yaml
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: greeting-app
+spec:
+  selector:
+    app: greeting-app
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+```
+## Apply the manifest
+```
+kubectl apply -f manifest/greeting-app-deployment.yaml -n play-demo
+kubectl apply -f manifest/greeting-app-service.yaml -n play-demo
+kubectl apply -f manifest/greeting-app-ingress.yaml -n play-demo
+```
