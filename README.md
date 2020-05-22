@@ -37,6 +37,8 @@ kiran@lagom-dx4:~/workspace/playapp/play-scala-seed$ curl localhost:9000
 kubectl apply -f greeting-app-git.yaml -n play-demo
 kubectl apply -f greeting-app-registry.yaml -n play-demo
 kubectl delete Task greeting-app-build-push -n play-demo && kubectl apply -f greeting-app-build-push.yaml -n play-demo
+kubectl delete Task deploy-using-kubectl -n play-demo && kubectl apply -f deploy-using-kubectl.yaml -n play-demo
+
 
 kubectl delete  TaskRun  greeting-app-taskrun -n play-demo && kubectl apply -f greeting-app-taskrun.yaml -n play-demo
 tkn taskrun describe greeting-app-taskrun -n play-demo 
@@ -144,4 +146,65 @@ spec:
 kubectl apply -f manifest/greeting-app-deployment.yaml -n play-demo
 kubectl apply -f manifest/greeting-app-service.yaml -n play-demo
 kubectl apply -f manifest/greeting-app-ingress.yaml -n play-demo
+```
+## Create a Task deploy-using-kubectl.yaml
+```
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-using-kubectl
+spec:
+  params:
+    - name: path
+      type: string
+      description: Path to the manifest to apply
+    - name: yamlPathToImage
+      type: string
+      description: |
+        The path to the image to replace in the yaml manifest (arg to yq)
+    - name: namespace
+      type: string
+      description : |
+        image will be deployed in this namesapce
+  resources:
+    inputs:
+      - name: source
+        type: git
+      - name: image
+        type: image
+  steps:
+    - name: replace-image
+      image: mikefarah/yq
+      command: ["yq"]
+      args:
+        - "w"
+        - "-i"
+        - "$(params.path)"
+        - "$(params.yamlPathToImage)"
+        - "$(resources.inputs.image.url)"
+    - name: run-kubectl
+      image: lachlanevenson/k8s-kubectl
+      command: ["kubectl"]
+      args:
+        - "apply"
+        - "-f"
+        - "$(params.path)"
+        - "-n"
+        - "$(params.namespace)"
+```
+##Configuring Pipeline execution credentials
+```
+kubectl create clusterrole tekton-role \
+               --verb=* \
+               --resource=deployments,deployments.apps  
+
+kubectl create clusterrolebinding tutorial-binding \
+  --clusterrole=tekton-role \
+  --serviceaccount=default:default 
+```
+
+## Deployment options
+```
+# kubectl set image deployments/kubernetes-bootcamp kubernetes-bootcamp=jocatalin/kubernetes-bootcamp:v2
+# kubectl set image deployments/greeting-app greeting-app=localhost:32000/play-demo/greeting-app:latest -n play-demo
 ```

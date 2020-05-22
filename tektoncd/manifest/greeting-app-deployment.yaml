@@ -18,4 +18,4 @@ spec:
         - name: greeting-app
           image: localhost:32000/play-demo/greeting-app:latest
           ports:
-            - containerPort: 9000
+            - containerPort: 9000 

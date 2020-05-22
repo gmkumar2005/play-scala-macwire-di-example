@@ -24,3 +24,25 @@ spec:
         outputs:
           - name: builtImage
             resource: play-demo-builtImage
+    - name: deploy-app
+      workspaces:
+        - name: sbt-repo
+          workspace: local-sbt-repo
+      params:
+        - name: path
+          value: $(resources.inputs.app-source.path)/tektoncd/manifest/greeting-app-deployment.yaml
+        - name: yamlPathToImage
+          value: $(resources.inputs.image.url) 
+        - name: namespace
+          value: play-demo
+      taskRef:
+        name: deploy-using-kubectl
+      runAfter:
+        - build-push-app
+      resources:
+        inputs:
+          - name: app-source
+            resource: play-demo-source
+          - name: image
+            resource: play-demo-builtImage
+        

@@ -1,16 +1,18 @@
 apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
-  name: greeting-app-taskrun
+  name: greeting-app-taskrun-1
 spec:
     taskRef:
-        name: greeting-app-build-push
+        name: deploy-using-kubectl
     resources:
-        inputs:
-            - name: greeting-source
-              resourceRef:
-                name: greeting-app-git
-        outputs:
-            - name: builtImage
-              resourceRef:
-                name: greeting-app-registry
+      - name: play-demo-source
+        resourceRef:
+          name: greeting-app-git
+      - name: play-demo-builtImage
+        resourceRef:
+          name: greeting-app-registry
+    workspaces:
+      - name: local-sbt-repo
+        persistentVolumeClaim:
+          claimName: sbt-repo-pvc

@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: play-demo-pipelinerun-66
+  name: play-demo-pipelinerun1-1
 spec:
   pipelineRef:
     name: play-demo-pipeline
