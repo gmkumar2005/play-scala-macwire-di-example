@@ -73,12 +73,12 @@ sudo systemctl restart snap.microk8s.daemon-apiserver.service
 ## Run play-demo image locally
 ```
 podman search registry.192.168.23.31.nip.io/ 
-podman run -it --rm -p 9000:9000 registry.192.168.23.31.nip.io/play-demo/greeting:latest
+podman run -it --rm -p 9000:9000 registry.192.168.23.31.nip.io/play-demo/greeting-app:latest
 
 ```
 ## Deploy and expose to microk8s - use localhost:32000 since it is already added to insecure registries
 ```
-kubectl create deployment greeting-app --image=localhost:32000/play-demo/greeting:latest -n play-demo 
+kubectl create deployment greeting-app --image=localhost:32000/play-demo/greeting-app:latest -n play-demo 
 kubectl expose deployment greeting-app --type=NodePort --port=9000 -n play-demo 
 ```
 ## Create ingress yaml greeting-app-deployment.yaml
@@ -101,7 +101,7 @@ spec:
     spec:
       containers:
         - name: greeting-app
-          image: localhost:32000/play-demo/greeting:latest
+          image: localhost:32000/play-demo/greeting-app:latest
           ports:
             - containerPort: 9000
 ```
