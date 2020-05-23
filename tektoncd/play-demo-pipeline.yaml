@@ -3,6 +3,10 @@ kind: Pipeline
 metadata:
   name: play-demo-pipeline
 spec:
+  results:
+    - name: image-with-digest
+      description: Full path of out image with digest
+      value: $(tasks.build-push-app.results.builtImage-digest)
   workspaces:
     - name: local-sbt-repo
   resources:
@@ -30,19 +34,18 @@ spec:
           workspace: local-sbt-repo
       params:
         - name: path
-          value: $(resources.inputs.app-source.path)/tektoncd/manifest/greeting-app-deployment.yaml
-        - name: yamlPathToImage
-          value: $(resources.inputs.image.url) 
+          value: $(resources.inputs.greeting-source.path)/tektoncd/manifest/greeting-app-deployment.yaml
         - name: namespace
           value: play-demo
+        - name: image-url-with-digest
+          value: $(tasks.build-push-app.results.builtImage-digest)
       taskRef:
         name: deploy-using-kubectl
       runAfter:
         - build-push-app
       resources:
         inputs:
-          - name: app-source
+          - name: greeting-source
             resource: play-demo-source
           - name: image
             resource: play-demo-builtImage
-        

@@ -8,29 +8,32 @@ spec:
   params:
     - name: path
       type: string
-      description: Path to the manifest to apply
-    - name: yamlPathToImage
-      type: string
-      description: |
-        The path to the image to replace in the yaml manifest (arg to yq)
+      description: Path to the deployment manifest to apply
     - name: namespace
       type: string
       description : |
         image will be deployed in this namesapce
+    - name: image-url-with-digest
+      type: string
+      description: full path to latest image with digest
   resources:
     inputs:
-      - name: app-source
+      - name: greeting-source
         type: git
       - name: image
         type: image
   steps:
+    - name: replace-image
+      image: mikefarah/yq
+      script: |
+        #!/bin/sh
+        set -xe
+        yq w -i $(params.path) "spec.template.spec.containers[0].image" $(params.image-url-with-digest)
+        echo "Manifest file name: " $(params.path)
+        cat $(params.path)
     - name: run-kubectl
       image: lachlanevenson/k8s-kubectl
-      command: ["kubectl"]
-      args:
-        - "apply"
-        - "-f"
-        - "$(params.path)"
-        - "-n"
-        - "$(params.namespace)"
-        
+      script: |
+        #!/bin/sh
+        set -xe
+        kubectl apply -f "$(params.path)" -n "$(params.namespace)"

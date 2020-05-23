@@ -3,6 +3,8 @@ kind: Task
 metadata:
   name: greeting-app-build-push
 spec:
+  results:
+    - name: builtImage-digest
   workspaces:
     - name: sbt-repo
   resources:
@@ -24,7 +26,7 @@ spec:
         ls -l 
     - name: dist
       image: hseeberger/scala-sbt:graalvm-ce-20.0.0-java11_1.3.10_2.13.2
-      workingDir: /workspace/greeting-source
+      workingDir: $(resources.inputs.greeting-source.path)
       script: |
         #!/bin/sh
         set -xe
@@ -41,7 +43,7 @@ spec:
         dist  
     - name : unzip
       image : busybox
-      workingDir: /workspace/greeting-source/target/universal
+      workingDir: $(resources.inputs.greeting-source.path)/target/universal
       script: |
         #!/bin/sh
         set -xe
@@ -51,7 +53,7 @@ spec:
       image: quay.io/buildah/stable
       securityContext:
         privileged: true
-      workingDir: /workspace/greeting-source/target/universal/app
+      workingDir: $(resources.inputs.greeting-source.path)/target/universal/app
       script: |
         #!/bin/sh
         set -xe
@@ -66,4 +68,6 @@ spec:
         -Dplay.http.secret.key=ad31779d4ee49d5ad5162bf1429c32e2e9933f3b" $container
         buildah commit --format docker $container $(resources.outputs.builtImage.url)
         buildah push --tls-verify=false $(resources.outputs.builtImage.url)
+        podman images  --format "$(resources.outputs.builtImage.url)@{{.Digest}}" $(resources.outputs.builtImage.url) | tee /tekton/results/builtImage-digest
+
      
