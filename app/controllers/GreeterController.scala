@@ -25,7 +25,7 @@ class GreeterController(greetingService: GreetingService,
   }
 
   def index = Action {
-    Ok(Html("<h1>Welcome</h1><p>Your new application is ready. Automatically deployed </p>"))
+    Ok(Html("<h1>Welcome CICD</h1><p>Your new application is ready. Automatically deployed </p>"))
   }
 
 }
