@@ -16,19 +16,22 @@ spec:
     - name: image-url-with-digest
       type: string
       description: full path to latest image with digest
+    - name: registry-host
+      type: string
+      description: Registry server hostname and port eg - "localhost:32000/play-demo/greeting-app"
   resources:
     inputs:
       - name: greeting-source
         type: git
-      - name: image
-        type: image
   steps:
     - name: replace-image
       image: mikefarah/yq
       script: |
         #!/bin/sh
         set -xe
-        yq w -i $(params.path) "spec.template.spec.containers[0].image" $(params.image-url-with-digest)
+        echo params.image-url-with-digest: $(params.image-url-with-digest)
+        yq r - a.path 
+        yq w -i  $(params.path) "spec.template.spec.containers[0].image" "$(params.registry-host)@$(params.image-url-with-digest)"
         echo "Manifest file name: " $(params.path)
         cat $(params.path)
     - name: run-kubectl

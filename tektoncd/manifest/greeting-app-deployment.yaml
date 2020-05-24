@@ -19,3 +19,4 @@ spec:
           image: localhost:32000/play-demo/greeting-app
           ports:
             - containerPort: 9000 
+          imagePullPolicy: Always

@@ -208,3 +208,16 @@ kubectl create clusterrolebinding tutorial-binding \
 # kubectl set image deployments/kubernetes-bootcamp kubernetes-bootcamp=jocatalin/kubernetes-bootcamp:v2
 # kubectl set image deployments/greeting-app greeting-app=localhost:32000/play-demo/greeting-app:latest -n play-demo
 ```
+
+## Remove unwanted tekton pods
+```
+kubectl delete pod --field-selector=status.phase==Succeeded -n play-demo
+kubectl delete pod --field-selector=status.phase==Terminated  -n play-demo
+kubectl delete pod --field-selector=status.phase==Failed  -n play-demo
+```
+
+## Debug yq
+```
+podman run --rm -v "${PWD}":/workdir mikefarah/yq  yq w  tektoncd/manifest/greeting-app-deployment.yaml "spec.template.spec.containers[0].image" "hello"
+
+```

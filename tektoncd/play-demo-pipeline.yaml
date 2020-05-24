@@ -39,6 +39,8 @@ spec:
           value: play-demo
         - name: image-url-with-digest
           value: $(tasks.build-push-app.results.builtImage-digest)
+        - name: registry-host
+          value: localhost:32000/play-demo/greeting-app
       taskRef:
         name: deploy-using-kubectl
       runAfter:
@@ -47,5 +49,3 @@ spec:
         inputs:
           - name: greeting-source
             resource: play-demo-source
-          - name: image
-            resource: play-demo-builtImage
