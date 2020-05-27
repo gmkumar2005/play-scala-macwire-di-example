@@ -2,6 +2,7 @@ lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
   .settings(
     name := """play-scala-macwire-di-example""",
+    maintainer := "Kiran.Kumar@company.org",
     version := "2.8.x",
     scalaVersion := "2.13.1",
     libraryDependencies ++= Seq(
